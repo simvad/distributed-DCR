@@ -28,7 +28,7 @@ def listen():
     event_id = message['event_id']
     vector_clock = VectorClock(message['vector_clock'])
     url = f'https://repository.dcrgraphs.net/api/graphs/{graph_id}/sims/{sim_id}/events/{event_id}'
-    if api_call(url, 'GET').status_code == 200:
+    if api_call(url, 'PUT').status_code == 200:
         #execute the effect
         #update the vector clock
         vector_clock.increment(role)
