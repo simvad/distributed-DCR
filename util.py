@@ -18,17 +18,14 @@ def api_call(url, method,json = None):
     #pprint(f'Response headers:{response.headers}')
     return response
 
-#A graph is defined by exactly one graph_id and exactly one sim_id
-class graph:
-    def __init__(self, graph_id, sim_id, role):
-        self.graph_id = graph_id
-        self.sim_id = sim_id
-        self.vector_clock = VectorClock(role)
-        self.role
-
 class VectorClock:
-    def __init__(self, role):
-        self.clock = {role: 0}
+    def __init__(self, role, vector=None):
+        if vector is None:
+            self.clock = {role: 0}
+        else:
+            self.clock = vector.copy()
+            if role not in self.clock:
+                self.clock[role] = 0
 
     def increment(self, role):
         if role in self.clock:
@@ -46,7 +43,7 @@ class VectorClock:
             if role not in other.clock:
                 other.clock[role] = self.clock[role]
 
-    #Returns true if other happened after self at role
+    # Returns true if other happened after self at role
     def happened_after(self, other, role):
         if role in self.clock and role in other.clock:
             return other.clock[role] > self.clock[role]
@@ -54,5 +51,13 @@ class VectorClock:
             return True
         else:
             return False
+    
+    def get(self):
+        return self.clock
+
     def __str__(self):
         return str(self.clock)
+
+#Is this the only needed information?
+def serialize_event(event_id, vector_clock):
+    return json.dumps({'event_id': event_id, 'vector_clock': vector_clock.get()})
